@@ -13,19 +13,49 @@ class App extends Component {
       name: '',
       userLineID: '',
       pictureUrl: '',
-      statusMessage: ''
+      statusMessage: '',
+      languageDevice: '',
+      versionSDK: '',
+      client: '',
+      isLogin: '',
+      os: ''
     };
   }
 
-  getProfile() {
-    liff.init(async () => {
-      let getProfile = await liff.getProfile();
-      this.setState({
-        name: getProfile.displayName,
-        userLineID: getProfile.userId,
-        pictureUrl: getProfile.pictureUrl,
-        statusMessage: getProfile.statusMessage
+  componentDidMount() {
+    liff.init({ liffId: '1579235015-DRJy4vn9' })
+      .then(async () => {
+        if (!liff.isLoggedIn()) {
+          liff.login();
+        }
+      })
+      .catch((err) => {
+        console.log(err)
       });
+  }
+
+  getProfile() {
+    liff.getProfile().then(dataInfo => {
+      this.setState({
+        name: dataInfo.displayName,
+        userLineID: dataInfo.userId,
+        pictureUrl: dataInfo.pictureUrl,
+        statusMessage: dataInfo.statusMessage
+      });
+    });
+
+    const languageDevice = liff.getLanguage();
+    const versionSDK = liff.getVersion();
+    const client = liff.isInClient();
+    const isLogin = liff.isLoggedIn();
+    const os = liff.getOS();
+
+    this.setState({
+      languageDevice: languageDevice,
+      versionSDK: versionSDK,
+      client: (client === true) ? 'YES' : 'NO',
+      isLogin: (isLogin === true) ? 'Login' : 'Not Login',
+      os: os
     });
   }
 
@@ -77,6 +107,41 @@ class App extends Component {
             (this.state.statusMessage && this.state.statusMessage != '')
               ?
               <p>statusMessage: {this.state.statusMessage}</p>
+              :
+              null
+          }
+          {
+            (this.state.languageDevice && this.state.languageDevice != '')
+              ?
+              <p>languageDevice: {this.state.languageDevice}</p>
+              :
+              null
+          }
+          {
+            (this.state.versionSDK && this.state.versionSDK != '')
+              ?
+              <p>versionSDK: {this.state.versionSDK}</p>
+              :
+              null
+          }
+          {
+            (this.state.client && this.state.client != '')
+              ?
+              <p>client: {this.state.client}</p>
+              :
+              null
+          }
+          {
+            (this.state.isLogin && this.state.isLogin != '')
+              ?
+              <p>isLogin: {this.state.isLogin}</p>
+              :
+              null
+          }
+          {
+            (this.state.os && this.state.os != '')
+              ?
+              <p>os: {this.state.os}</p>
               :
               null
           }
